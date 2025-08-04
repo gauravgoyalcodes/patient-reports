@@ -45,6 +45,22 @@ public class ReportService {
             throw new IllegalArgumentException("Doctor name not found in PDF.");
         }
 
+        //parse patient name
+        String extractedPatientName = extractPatientName(text);
+        log.info("Patient name extracted: " + extractedPatientName);
+
+//        if (extractedPatientName == null) {
+//            throw new IllegalArgumentException("Patient name not found in PDF.");
+//        }
+
+        //parse patient age
+        String extractedPatientAge = extractPatientAge(text);
+        log.info("Patient age extracted: " + extractedPatientAge);
+
+//        if (extractedPatientAge == null) {
+//            throw new IllegalArgumentException("Patient Age not found in PDF.");
+//        }
+
         // Step 3: Normalize doctor name (remove prefix)
         String normalizedDoctorName = normalizeDoctorName(extractedDoctorName);
         log.info("Normalized doctor name: " + normalizedDoctorName);
@@ -63,6 +79,12 @@ public class ReportService {
 
         // Step 6: Save report metadata
         Report report = new Report();
+        if (extractedPatientName != null){
+            report.setPatientName(extractedPatientName);
+        }
+        if (extractedPatientAge != null){
+            report.setPatientAge(extractedPatientAge);
+        }
         report.setFileName(file.getOriginalFilename());
         report.setFilePath(filePath.toString());
         report.setUploadDate(LocalDate.now());
@@ -102,6 +124,24 @@ public class ReportService {
             }
         }
 
+        return null;
+    }
+
+    private String extractPatientName(String text) {
+        Pattern pattern = Pattern.compile("(?i)Patient Name\\s+(Mr\\.?|Mrs\\.?|Ms\\.?|Miss)?\\s*([A-Z\\s]+?)(?=\\s+Gender|\\r|\\n)");
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return matcher.group(2).trim();
+        }
+        return null;
+    }
+
+    private String extractPatientAge(String text) {
+        Pattern pattern = Pattern.compile("(?i)Gender\\s*/\\s*Age\\s+[A-Za-z]+\\s*/\\s*(\\d{1,3})\\s*Yrs");
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
         return null;
     }
 
