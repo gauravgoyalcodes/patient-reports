@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,9 @@ public class DoctorService {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private static final String PREFIX = "DR";
 
     //registering a doctor
@@ -35,6 +39,7 @@ public class DoctorService {
             doctor.setCreatedAt(LocalDateTime.now());
             doctor.setUpdatedAt(LocalDateTime.now());
             doctor.setActive(true);
+            doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
             log.info("Final doctor object before saving: {}", doctor);
             doctorRepository.save(doctor);
             log.info("Doctor saved successfully: {}", doctor);
