@@ -1,7 +1,9 @@
 package com.reports.service;
 
 import com.reports.entity.Doctor;
+import com.reports.entity.Report;
 import com.reports.repository.DoctorRepository;
+import com.reports.repository.ReportRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class DoctorService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -55,12 +60,19 @@ public class DoctorService {
         return doctorRepository.findAll();
     }
 
-    //updating the doctor data
-    public void updateDoctorDetails(Doctor doctor){
-        Doctor d = doctorRepository.findByEmail(doctor.getEmail());
-
-
+    //get logged in doctor details
+    public Doctor getDoctorDetails(String email) {
+        return doctorRepository.findByEmail(email);
     }
+
+
+    //get reports associated to doctor
+    public List<Report> getReportAssociatedtoDoctor(String email){
+        String doctorId = doctorRepository.findByEmail(email).getDoctorId();
+        List<Report> reports = reportRepository.findByAssignedDoctorDoctorId(doctorId);
+        return reports;
+    }
+
     public String generateDoctorId() {
 
         String lastId = doctorRepository.findLastDoctorId(); // e.g., "DR0001"

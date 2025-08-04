@@ -1,6 +1,7 @@
 package com.reports.controller;
 
 import com.reports.entity.Doctor;
+import com.reports.entity.Report;
 import com.reports.service.DoctorService;
 
 import com.reports.utility.AuthRequest;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +76,7 @@ public class DoctorController {
         }
     }
 
-    @GetMapping("/doctors")
+    @GetMapping("/all-doctors")
     public ResponseEntity<List<Doctor>> getAllDoctors() {
 
         List<Doctor> doctors = doctorService.getListOfAllDoctors();
@@ -84,6 +86,18 @@ public class DoctorController {
         return new ResponseEntity<>(doctors, HttpStatus.OK); // 200
     }
 
+    @GetMapping("/details")
+    public ResponseEntity<Doctor> getLoggedInDoctor(Authentication authentication) {
+        Doctor doctor = doctorService.getDoctorDetails(authentication.getName());
+        return ResponseEntity.ok(doctor);
+    }
 
-
+    @GetMapping("/reports")
+    public ResponseEntity<List<Report>> getLoggedInDoctorReports(Authentication authentication) {
+        List<Report> reports = doctorService.getReportAssociatedtoDoctor(authentication.getName());
+        if (reports == null || reports.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204
+        }
+        return new ResponseEntity<>(reports, HttpStatus.OK); // 200
+    }
 }
