@@ -50,6 +50,12 @@ public class DoctorService {
         return doctorRepository.findAll();
     }
 
+    //updating the doctor data
+    public void updateDoctorDetails(Doctor doctor){
+        Doctor d = doctorRepository.findByEmail(doctor.getEmail());
+
+
+    }
     public String generateDoctorId() {
 
         String lastId = doctorRepository.findLastDoctorId(); // e.g., "DR0001"
