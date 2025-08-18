@@ -1,6 +1,7 @@
 package com.reports.utility;
 
 import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,12 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        if (path.startsWith("/uploads/")) {
+            chain.doFilter(request, response);
+            return; // Skip JWT auth for uploads
+        }
+
         String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
@@ -48,3 +55,4 @@ public class JwtFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+
